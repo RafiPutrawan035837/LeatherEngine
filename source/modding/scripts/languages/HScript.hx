@@ -124,6 +124,7 @@ class HScript extends Script {
 		set("Conductor", game.Conductor);
 		set("Paths", Paths);
 		set("CoolUtil", utilities.CoolUtil);
+		set("MathUtil", utilities.MathUtil);
 		set('Options', utilities.Options);
 		set('Character', game.Character);
 		set('Alphabet', ui.Alphabet);
