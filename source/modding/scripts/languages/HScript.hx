@@ -29,7 +29,6 @@ class HScript extends Script {
 	**/
 	public var interp:Interp = new Interp();
 
-
 	public function new(path:String, executeOn:ExecuteOn = BOTH) {
 		super(path, executeOn);
 		// parser settings
@@ -45,7 +44,7 @@ class HScript extends Script {
 
 		interp.printCallStack = true;
 		interp.execute(program);
-		if(this.executeOn != STAGE)
+		if (this.executeOn != STAGE)
 			call("create", [path]);
 	}
 
@@ -74,18 +73,18 @@ class HScript extends Script {
 		return true;
 	}
 
-	override public function set(variable:String, value:Any){
+	override public function set(variable:String, value:Any) {
 		interp.variables.set(variable, value);
-		for(script in otherScripts) {
+		for (script in otherScripts) {
 			script.set(variable, value);
 		}
 	}
 
-	override public function destroy(){}
+	override public function destroy() {}
 
 	override public function setup() {
 		// global class shit
-		//setDefaults();
+		// setDefaults();
 
 		// haxeflixel classes
 		set("FlxG", flixel.FlxG);
@@ -118,7 +117,6 @@ class HScript extends Script {
 		set("EnumValueMap", haxe.ds.EnumValueMap);
 		set("ObjectMap", haxe.ds.ObjectMap);
 
-
 		// game classes
 		set("PlayState", states.PlayState);
 		set("Conductor", game.Conductor);
@@ -150,6 +148,23 @@ class HScript extends Script {
 			set('NoteMovement', modcharting.NoteMovement);
 			set('NotePositionData', modcharting.NotePositionData);
 			set('ModchartFile', modcharting.ModchartFile);
+			set('startMod', function(name:String, modClass:String, type:String = '', pf:Int = -1) {
+				modcharting.ModchartFuncs.startMod(name, modClass, type, pf);
+	
+				PlayState.instance.playfieldRenderer.modifierTable.reconstructTable(); // needs to be reconstructed for lua modcharts
+			});
+			set('setMod', modcharting.ModchartFuncs.setMod);
+			set('setSubMod', modcharting.ModchartFuncs.setSubMod);
+			set('setModTargetLane', modcharting.ModchartFuncs.setModTargetLane);
+			set('setModPlayfield', modcharting.ModchartFuncs.setModPlayfield);
+			set('addPlayfield', modcharting.ModchartFuncs.addPlayfield);
+			set('removePlayfield', modcharting.ModchartFuncs.removePlayfield);
+			set('tweenModifier', modcharting.ModchartFuncs.tweenModifier);
+			set('tweenModifierSubValue', modcharting.ModchartFuncs.tweenModifierSubValue);
+			set('setModEaseFunc', modcharting.ModchartFuncs.setModEaseFunc);
+			set('setModifier', modcharting.ModchartFuncs.set);
+			set('easeModifier', modcharting.ModchartFuncs.ease);
+			set('ease', modcharting.ModchartFuncs.ease);
 		}
 		#end
 
@@ -174,14 +189,13 @@ class HScript extends Script {
 				trace(class_name + " isn't a valid class or enum!", WARNING);
 		});
 
-
 		set("trace", Reflect.makeVarArgs(function(el) {
 			@:privateAccess
 			var inf = cast {fileName: path, lineNumber: interp.curExpr.line};
 			var v = el.shift();
 			if (el.length > 0)
 				inf.customParams = el;
-			
+
 			haxe.Log.trace(Std.string(v), inf);
 		}));
 

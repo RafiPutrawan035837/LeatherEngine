@@ -994,6 +994,7 @@ class ChartingState extends MusicBeatState {
 
 		FlxG.sound.music = new FlxSound().loadEmbedded(Paths.inst(daSong, _song.specialAudioName ?? difficulty_name, _song.player1));
 		FlxG.sound.music.persist = true;
+		Conductor.songPosition = FlxG.sound.music.time;
 
 		vocals = new SoundGroup(2);
 		if (_song.needsVoices) {
@@ -1016,6 +1017,7 @@ class ChartingState extends MusicBeatState {
 			vocals.time = 0;
 			FlxG.sound.music.pause();
 			FlxG.sound.music.time = 0;
+			Conductor.songPosition = FlxG.sound.music.time;
 			changeSection();
 		};
 	}
@@ -1235,7 +1237,9 @@ class ChartingState extends MusicBeatState {
 
 		curStep = recalculateSteps();
 
-		Conductor.songPosition = FlxG.sound.music.time;
+		if(FlxG.sound.music.playing){
+			Conductor.songPosition += FlxG.elapsed * 1000.0 #if FLX_PITCH * FlxG.sound.music.pitch #end ;
+		}
 		_song.song = typingShit.text;
 		difficulty = swagShit.text.toLowerCase();
 		PlayState.storyDifficultyStr = difficulty.toUpperCase();
@@ -1568,8 +1572,7 @@ class ChartingState extends MusicBeatState {
 			FlxG.sound.music.time = 0;
 			curSection = 0;
 		}
-
-		vocals.time = FlxG.sound.music.time;
+		Conductor.songPosition = vocals.time = FlxG.sound.music.time;
 		updateCurStep();
 
 		updateGrid();
