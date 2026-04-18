@@ -12,5 +12,5 @@ void main() {
   // Get difference to use for falloff if required
   float diff = col.r - ((col.g + col.b) / 2.0);
 
-  ofl_FragColor = vec4(((col.g + col.b) / 2.0) + (red * diff), col.g + (green * diff), col.b + (blue * diff), col.a);
+  gl_FragColor = vec4(((col.g + col.b) / 2.0) + (red * diff), col.g + (green * diff), col.b + (blue * diff), col.a);
 }

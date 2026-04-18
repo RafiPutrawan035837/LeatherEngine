@@ -45,7 +45,7 @@ vec2 screenToBitmap(vec2 screenCoord)
 
 vec4 sampleBitmapScreen(vec2 screenCoord)
 {
-	return texture(bitmap, screenToBitmap(screenCoord));
+	return flixel_texture2D(bitmap, screenToBitmap(screenCoord));
 }
 
 vec4 sampleBitmapWorld(vec2 worldCoord)
@@ -217,5 +217,5 @@ void main() {
 	color = mix(color, rainColor, 0.1 * rainSum);
 
 	// alpha 1.0 doesn't really matter for camGame
-	ofl_FragColor = vec4(color, 1.0);
+	gl_FragColor = vec4(color, 1.0);
 }

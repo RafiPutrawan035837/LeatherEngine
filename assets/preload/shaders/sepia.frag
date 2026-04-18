@@ -22,5 +22,5 @@ void main() {
 	color = to_sepia(color);
 
     // Return the value.
-	ofl_FragColor = color;
+	gl_FragColor = color;
 }

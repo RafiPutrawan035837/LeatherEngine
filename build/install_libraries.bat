@@ -6,10 +6,10 @@ REM haxelib fixrepo
 haxelib git hxcpp https://github.com/FunkinCrew/hxcpp
 haxelib install format
 haxelib install hxp
-haxelib --skip-dependencies git lime https://github.com/swordcubes-grave-of-shite/lime
-haxelib --skip-dependencies git openfl https://github.com/swordcubes-grave-of-shite/openfl 50835d47762a6ea41176aa11c9cc10e77e172ffd
-haxelib --skip-dependencies git flixel https://github.com/swordcubes-grave-of-shite/flixel 428f18f3b70ece751a51e5f19997a308e8c4b27f 
-haxelib --skip-dependencies git flixel-addons https://github.com/swordcubes-grave-of-shite/flixel-addons 3283d19b4396536d575d3901952ecad1a158deee
+haxelib --skip-dependencies git lime https://github.com/swordcubes-grave-of-shite/lime-fc-old d33313e85b1655fa48c3b4ee107173b673683eaf
+haxelib --skip-dependencies git openfl https://github.com/swordcubes-grave-of-shite/openfl ce9641599a5343dff7e04f942a0f6b12fa98cb3d
+haxelib --skip-dependencies git flixel https://github.com/swordcubes-grave-of-shite/flixel be195af29beb962ed1018c0e8977133fb08184d8 
+haxelib --skip-dependencies git flixel-addons https://github.com/swordcubes-grave-of-shite/flixel-addons 43ec587fcc004d20a6219cf22d83c8644379a2f2
 haxelib --skip-dependencies git flixel-ui https://github.com/swordcubes-grave-of-shite/flixel-ui dev
 haxelib git linc_luajit https://github.com/Leather128/linc_luajit.git
 haxelib git hscript-improved https://github.com/CodenameCrew/hscript-improved fe673c21b278819805aaa730216ec527c2507443
@@ -26,7 +26,7 @@ haxelib git funkin.vis https://github.com/FunkinCrew/funkVis
 haxelib git jsonpath https://github.com/EliteMasterEric/jsonpath
 haxelib --skip-dependencies git jsonpatch https://github.com/EliteMasterEric/jsonpatch
 haxelib install hxcpp-debug-server
-haxelib --always set lime 8.2.2
+haxelib --always set lime 8.3.1
 haxelib run lime rebuild hxcpp
 haxelib --always set lime git
 haxelib --always run lime rebuild windows

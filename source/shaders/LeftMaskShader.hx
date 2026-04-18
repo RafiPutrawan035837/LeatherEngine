@@ -59,9 +59,9 @@ class LeftMaskShader extends FlxShader
                 color = vec4(0.0, 0.0, 0.0, 0.0);
             }
 
-            ofl_FragColor = color;
+            gl_FragColor = color;
 			// vec4 testCol = vec4(openfl_Position.x, openfl_Position.y, openfl_Position.z, 1.0);
-			//ofl_FragColor = vec4(1.0, openfl_TextureSize.x, 1.0, 1.0);
+			//gl_FragColor = vec4(1.0, openfl_TextureSize.x, 1.0, 1.0);
 
         }
     ')

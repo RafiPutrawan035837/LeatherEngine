@@ -80,8 +80,6 @@ class TitleState extends MusicBeatState {
 
 			FlxG.allowAntialiasing = FlxSprite.defaultAntialiasing = Options.getData("antialiasing");
 
-			FlxG.stage.window.vsync = Options.getData("vSync");
-
 			PlayerSettings.init();
 			PlayerSettings.player1.controls.loadKeyBinds();
 

@@ -15,5 +15,5 @@ void main() {
 	}
 
   // Return the value.
-	ofl_FragColor = color;
+	gl_FragColor = color;
 }

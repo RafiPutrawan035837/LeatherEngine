@@ -87,11 +87,11 @@ vec2 hash22(vec2 p) {
 }
 
 float intensityPass(vec2 fragCoord, float curThreshold, bool useMask) {
-    vec4 col = texture(bitmap, fragCoord);
+    vec4 col = flixel_texture2D(bitmap, fragCoord);
 
     float maskIntensity = 0.0;
     if(useMask == true) {
-        maskIntensity = mix(0.0, 1.0, texture(altMask, fragCoord).b);
+        maskIntensity = mix(0.0, 1.0, flixel_texture2D(altMask, fragCoord).b);
     }
 
     if(col.a == 0.0) {
@@ -151,7 +151,7 @@ vec3 createDropShadow(vec3 col, float curThreshold, bool useMask) {
     float dropShadowAmount = 0.0;
 
     if(checkedPixel.x > uFrameBounds.x && checkedPixel.y > uFrameBounds.y && checkedPixel.x < uFrameBounds.z && checkedPixel.y < uFrameBounds.w) {
-        dropShadowAmount = texture(bitmap, checkedPixel).a;
+        dropShadowAmount = flixel_texture2D(bitmap, checkedPixel).a;
     }
 
         // add the dropshadow color  based on the amount, strength, and intensity
@@ -161,7 +161,7 @@ vec3 createDropShadow(vec3 col, float curThreshold, bool useMask) {
 }
 
 void main() {
-    vec4 col = texture(bitmap, openfl_TextureCoordv);
+    vec4 col = flixel_texture2D(bitmap, openfl_TextureCoordv);
 
     vec3 unpremultipliedColor = col.a > 0.0 ? col.rgb / col.a : col.rgb;
 
@@ -169,5 +169,5 @@ void main() {
 
     outColor = createDropShadow(outColor, thr, useMask);
 
-    ofl_FragColor = vec4(outColor.rgb * col.a, col.a);
+    gl_FragColor = vec4(outColor.rgb * col.a, col.a);
 }

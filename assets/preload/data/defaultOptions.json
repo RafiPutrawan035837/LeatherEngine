@@ -57,10 +57,6 @@
 			"value": 120
 		},
 		{
-			"option": "vSync",
-			"value": false
-		},
-		{
 			"option": "cutscenePlaysOn",
 			"value": "story"
 		},

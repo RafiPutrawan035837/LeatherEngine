@@ -114,9 +114,6 @@ class Note extends #if MODCHARTING_TOOLS modcharting.FlxSprite3D #else flixel.ad
 	public static final beats:Array<Int> = [4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192];
 
 	public static function applyColorQuants(notes:Array<Note>) {
-		if (!Options.getData('colorQuantization')) {
-			return;
-		}
 		var col:Array<Int> = [255, 0, 0];
 		for (note in notes) {
 			if (!note.isSustainNote && note.affectedbycolor) {

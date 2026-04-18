@@ -25,5 +25,5 @@ void main() {
 		color.b = colorBlue;
 
   // Return the value.
-	ofl_FragColor = color;
+	gl_FragColor = color;
 }

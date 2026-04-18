@@ -7,5 +7,5 @@ void main() {
 	if (color.a > 0.0)
 		color -= alphaShit;
 
-	ofl_FragColor = color;
+	gl_FragColor = color;
 }

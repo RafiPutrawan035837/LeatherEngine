@@ -72,12 +72,12 @@
 
            
             
-            ofl_FragColor = color;
+            gl_FragColor = color;
             
             
             /* 
             if (color.a > 0.5)
-                ofl_FragColor = color;
+                gl_FragColor = color;
             else
             {
                 float a = flixel_texture2D(bitmap, vec2(openfl_TextureCoordv + offset, openfl_TextureCoordv.y)).a +
@@ -85,8 +85,8 @@
                           flixel_texture2D(bitmap, vec2(openfl_TextureCoordv - offset, openfl_TextureCoordv.y)).a +
                           flixel_texture2D(bitmap, vec2(openfl_TextureCoordv, openfl_TextureCoordv.y + offset)).a;
                 if (color.a < 1.0 && a > 0.0)
-                    ofl_FragColor = vec4(0.0, 0.0, 0.0, 0.8);
+                    gl_FragColor = vec4(0.0, 0.0, 0.0, 0.8);
                 else
-                    ofl_FragColor = color;
+                    gl_FragColor = color;
             } */
         }

@@ -1061,7 +1061,9 @@ class PlayState extends MusicBeatState {
 			call("onEventLoaded", [event[0], event[1], event[2], event[3]]);
 		}
 
-		Note.applyColorQuants(unspawnNotes);
+		if (Options.getData('colorQuantization')) {
+			Note.applyColorQuants(unspawnNotes);
+		}
 
 		super.create();
 

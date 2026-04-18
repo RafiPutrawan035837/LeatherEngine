@@ -39,6 +39,6 @@ void main() {
   // approximate "lightness" changing!!
   swagColor.z *= (_hue * 0.5) + 0.5;
   color = vec4(hsv2rgb(vec3(swagColor[0], swagColor[1], swagColor[2])), swagColor[3]);
-	ofl_FragColor = color;
+	gl_FragColor = color;
 }
 

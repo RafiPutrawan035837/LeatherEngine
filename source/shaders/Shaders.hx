@@ -99,7 +99,7 @@ class ThreeDShader extends FlxShader {
     void main()
     {
         vec2 uv = sineWave(openfl_TextureCoordv);
-        ofl_FragColor = texture(bitmap, uv);
+        gl_FragColor = flixel_texture2D(bitmap, uv);
     }')
 	public function new() {
 		super();

@@ -35,7 +35,7 @@ class PureColor extends FlxShader
             if (color.a > 0.0 && colSet)
                 color = vec4(funnyColor.r, funnyColor.g, funnyColor.b, color.a);
 
-            ofl_FragColor = color;
+            gl_FragColor = color;
         }
     ')
   public function new(colr:FlxColor)

@@ -21,5 +21,5 @@ void main() {
 	color = min(color, vec4(1.0, 1.0, 1.0, 1.0));
 
   // Return the value.
-	ofl_FragColor = color;
+	gl_FragColor = color;
 }

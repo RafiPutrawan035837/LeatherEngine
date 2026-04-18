@@ -38,7 +38,7 @@ vec3 blend(vec3 bg, vec3 src) {
 
 void main() {
 	vec4 bg = sampleBitmapScreen(screenCoord);
-	vec4 src = texture(source, screenCoord);
+	vec4 src = flixel_texture2D(source, screenCoord);
 	vec3 res = blend(bg.rgb, src.rgb);
-	ofl_FragColor = vec4(mix(bg.rgb, res.rgb, src.a), mix(bg.a, 1.0, src.a));
+	gl_FragColor = vec4(mix(bg.rgb, res.rgb, src.a), mix(bg.a, 1.0, src.a));
 }

@@ -49,7 +49,6 @@ class OptionsMenu extends MusicBeatState {
 			new PageOption("Info Display", "Info Display", "Change optiosn related to the info display.\n(FPS counter, memory display, etc)."),
 			new PageOption("Optimizations", "Optimizations", "Change optimization options, such as anitaliasing."),
 			new GameSubStateOption("Max FPS", substates.MaxFPSMenu, "Change the maximum framerate."),
-			new BoolOption("VSync", "vSync", "Toggle VSync."),
 			new BoolOption("Bigger Score Text", "biggerScoreInfo", "When toggled, the score text will have a larger font."),
 			new BoolOption("Bigger Info Text", "biggerInfoText", "When toggled, the time bar will have a larger font."),
 			new StringSaveOption("Time Bar Style", ["leather engine", "psych engine", "old kade engine"], "timeBarStyle", "Change the style of the time bar."),
@@ -223,7 +222,9 @@ class OptionsMenu extends MusicBeatState {
 	#end
 
 	public override function create():Void {
+		#if MODDING_ALLOWED
 		addModOptions();
+		#end
 		MusicBeatState.windowNameSuffix = "";
 		instance = this;
 
