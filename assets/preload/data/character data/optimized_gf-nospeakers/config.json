@@ -4,6 +4,7 @@
   "imagePath": "Optimized_GF_assets",
   "barColor": [186, 49, 104],
   "healthIcon": "gf",
+  "singDuration": 6.1,
   "animations": [
     {
       "name": "danceLeft",

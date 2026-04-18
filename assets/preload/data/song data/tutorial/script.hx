@@ -5,7 +5,7 @@ function createPost(){
 var spinLength = 0;
 
 function update(elapsed){
-    if(PlayState.instance.curStep > 400){
+    if(PlayState.instance.curStep > 400 && PlayState.storyDifficultyStr.toLowerCase() == "hard"){
         if(spinLength < 32){
             spinLength += 0.2 * elapsed * 60;
         }
