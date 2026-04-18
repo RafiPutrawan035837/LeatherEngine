@@ -7,8 +7,8 @@ left up right left2 down right2
 left up right square left2 down right2
 left down up right left2 down2 up2 right2
 left down up right square left2 down2 up2 right2
-left down up right rup rdown left2 down2 up2 right2
-left down up right rup plus rdown left2 down2 up2 right2
+left down up right rdown rup left2 down2 up2 right2
+left down up right rdown plus rup left2 down2 up2 right2
 left down up right rleft rdown rup rright left2 down2 up2 right2
 left down up right rleft rright square rleft2 rright2 left2 down2 up2 right2
 left down up right rleft rright square plus rleft2 rright2 left2 down2 up2 right2
