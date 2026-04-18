@@ -71,143 +71,145 @@ class StageGroup extends FlxGroup {
 
 		clear();
 
-		switch (stage) {
-			// incase you want to harcode your stage
-			default:
-				{
-					if (stageData != null) {
-						camZoom = stageData.camera_Zoom;
-						useAbsolutePositions = (stageData?.useAbsolutePositions) ?? false;
+		if (stage != "" && stage != null && Options.getData("charsAndBGs")) {
+			switch (stage) {
+				// incase you want to harcode your stage
+				default:
+					{
+						if (stageData != null) {
+							camZoom = stageData.camera_Zoom;
+							useAbsolutePositions = (stageData?.useAbsolutePositions) ?? false;
 
-						if (stageData.camera_Offsets != null) {
-							p1_Cam_Offset.set(stageData.camera_Offsets[0][0], stageData.camera_Offsets[0][1]);
-							p2_Cam_Offset.set(stageData.camera_Offsets[1][0], stageData.camera_Offsets[1][1]);
-						}
-
-						player_1_Point.set(stageData.character_Positions[0][0], stageData.character_Positions[0][1]);
-						player_2_Point.set(stageData.character_Positions[1][0], stageData.character_Positions[1][1]);
-						gf_Point.set(stageData.character_Positions[2][0], stageData.character_Positions[2][1]);
-
-						if (stageData.character_Scrolls != null) {
-							p1_Scroll = stageData.character_Scrolls[0];
-							p2_Scroll = stageData.character_Scrolls[1];
-							gf_Scroll = stageData.character_Scrolls[2];
-						}
-
-						if (stageData.characterZIndices != null) {
-							p1ZIndex = stageData.characterZIndices[0];
-							p2ZIndex = stageData.characterZIndices[1];
-							gfZIndex = stageData.characterZIndices[2];
-						}
-
-						var nullObjectNameLoop:Int = 0;
-
-						for (object in stageData.objects) {
-							var sprite:FlxSprite = object.dances ? new DancingSprite(object.position[0],
-								object.position[1]) : new FlxSprite(object.position[0], object.position[1]);
-
-							if (Options.getData("shaders"))
-								sprite.shader = colorSwap.shader;
-
-							if (object.color != null && object.color != [])
-								sprite.color = FlxColor.fromRGB(object.color[0], object.color[1], object.color[2]);
-
-							if (object.blend != null) {
-								@:privateAccess
-								sprite.blend = BlendMode.fromString(object.blend);
+							if (stageData.camera_Offsets != null) {
+								p1_Cam_Offset.set(stageData.camera_Offsets[0][0], stageData.camera_Offsets[0][1]);
+								p2_Cam_Offset.set(stageData.camera_Offsets[1][0], stageData.camera_Offsets[1][1]);
 							}
 
-							sprite.antialiasing = object.antialiased && Options.getData("antialiasing");
-							sprite.scrollFactor.set(object.scroll_Factor[0], object.scroll_Factor[1]);
+							player_1_Point.set(stageData.character_Positions[0][0], stageData.character_Positions[0][1]);
+							player_2_Point.set(stageData.character_Positions[1][0], stageData.character_Positions[1][1]);
+							gf_Point.set(stageData.character_Positions[2][0], stageData.character_Positions[2][1]);
 
-							if (object.object_Name != null && object.object_Name != "")
-								stageObjects.push([object.object_Name, sprite, object]);
-							else {
-								stageObjects.push(["undefinedSprite" + nullObjectNameLoop, sprite, object]);
-								nullObjectNameLoop++;
+							if (stageData.character_Scrolls != null) {
+								p1_Scroll = stageData.character_Scrolls[0];
+								p2_Scroll = stageData.character_Scrolls[1];
+								gf_Scroll = stageData.character_Scrolls[2];
 							}
 
-							if (object.is_Animated) {
-								sprite.frames = Paths.getSparrowAtlas((stageData.imageDirectory ?? stage) + "/" + object.file_Name, "stages");
+							if (stageData.characterZIndices != null) {
+								p1ZIndex = stageData.characterZIndices[0];
+								p2ZIndex = stageData.characterZIndices[1];
+								gfZIndex = stageData.characterZIndices[2];
+							}
 
-								for (animation in object.animations) {
-									var animName:String = animation.name;
+							var nullObjectNameLoop:Int = 0;
 
-									if (animation.name == "beatHit")
-										onBeatHit_Group.add(sprite);
+							for (object in stageData.objects) {
+								var sprite:FlxSprite = object.dances ? new DancingSprite(object.position[0],
+									object.position[1]) : new FlxSprite(object.position[0], object.position[1]);
 
-									if (animation.indices == null) {
-										sprite.animation.addByPrefix(animName, animation.animation_name, animation.fps, animation.looped);
-									} else if (animation.indices.length == 0) {
-										sprite.animation.addByPrefix(animName, animation.animation_name, animation.fps, animation.looped);
-									} else {
-										sprite.animation.addByIndices(animName, animation.animation_name, animation.indices, "", animation.fps,
-											animation.looped);
+								if (Options.getData("shaders"))
+									sprite.shader = colorSwap.shader;
+
+								if (object.color != null && object.color != [])
+									sprite.color = FlxColor.fromRGB(object.color[0], object.color[1], object.color[2]);
+
+								if (object.blend != null) {
+									@:privateAccess
+									sprite.blend = BlendMode.fromString(object.blend);
+								}
+
+								sprite.antialiasing = object.antialiased && Options.getData("antialiasing");
+								sprite.scrollFactor.set(object.scroll_Factor[0], object.scroll_Factor[1]);
+
+								if (object.object_Name != null && object.object_Name != "")
+									stageObjects.push([object.object_Name, sprite, object]);
+								else {
+									stageObjects.push(["undefinedSprite" + nullObjectNameLoop, sprite, object]);
+									nullObjectNameLoop++;
+								}
+
+								if (object.is_Animated) {
+									sprite.frames = Paths.getSparrowAtlas((stageData.imageDirectory ?? stage) + "/" + object.file_Name, "stages");
+
+									for (animation in object.animations) {
+										var animName:String = animation.name;
+
+										if (animation.name == "beatHit")
+											onBeatHit_Group.add(sprite);
+
+										if (animation.indices == null) {
+											sprite.animation.addByPrefix(animName, animation.animation_name, animation.fps, animation.looped);
+										} else if (animation.indices.length == 0) {
+											sprite.animation.addByPrefix(animName, animation.animation_name, animation.fps, animation.looped);
+										} else {
+											sprite.animation.addByIndices(animName, animation.animation_name, animation.indices, "", animation.fps,
+												animation.looped);
+										}
 									}
+
+									if (object.start_Animation != "" && object.start_Animation != null && object.start_Animation != "null")
+										sprite.animation.play(object.start_Animation);
+								} else if (object.file_Name.startsWith('#')) {
+									sprite.makeGraphic(Std.int(object.scale), Std.int(object.scale), FlxColor.fromString(object.file_Name));
+								} else
+									sprite.loadGraphic(Paths.gpuBitmap((stageData.imageDirectory ?? stage) + "/" + object.file_Name, "stages"));
+
+								if (object.scaleY == null) {
+									object.scaleY = (object?.scale) ?? 1;
 								}
 
-								if (object.start_Animation != "" && object.start_Animation != null && object.start_Animation != "null")
-									sprite.animation.play(object.start_Animation);
-							} else if (object.file_Name.startsWith('#')) {
-								sprite.makeGraphic(Std.int(object.scale), Std.int(object.scale), FlxColor.fromString(object.file_Name));
-							} else
-								sprite.loadGraphic(Paths.gpuBitmap((stageData.imageDirectory ?? stage) + "/" + object.file_Name, "stages"));
+								sprite.scale.set(object.scale, object.scaleY);
 
-							if (object.scaleY == null) {
-								object.scaleY = (object?.scale) ?? 1;
+								if (object.updateHitbox || object.updateHitbox == null)
+									sprite.updateHitbox();
+
+								if (object.flipX != null)
+									sprite.flipX = object.flipX;
+
+								if (object.flipY != null)
+									sprite.flipY = object.flipY;
+
+								if (object.alpha != null)
+									sprite.alpha = object.alpha;
+
+								if (object.zIndex != null)
+									sprite.zIndex = object.zIndex;
+
+								if (object.layer != null) {
+									switch (object.layer.toLowerCase().trim()) {
+										case "foreground":
+											foregroundSprites.add(sprite);
+										case "gf":
+											infrontOfGFSprites.add(sprite);
+										default:
+											add(sprite);
+									}
+								} else
+									add(sprite);
 							}
-
-							sprite.scale.set(object.scale, object.scaleY);
-
-							if (object.updateHitbox || object.updateHitbox == null)
-								sprite.updateHitbox();
-
-							if (object.flipX != null)
-								sprite.flipX = object.flipX;
-
-							if (object.flipY != null)
-								sprite.flipY = object.flipY;
-
-							if (object.alpha != null)
-								sprite.alpha = object.alpha;
-
-							if (object.zIndex != null)
-								sprite.zIndex = object.zIndex;
-
-							if (object.layer != null) {
-								switch (object.layer.toLowerCase().trim()) {
-									case "foreground":
-										foregroundSprites.add(sprite);
-									case "gf":
-										infrontOfGFSprites.add(sprite);
-									default:
-										add(sprite);
+						}
+						if (stageData.scriptName == null) {
+							stageData.scriptName = stage;
+						}
+						if (FlxG.state is PlayState) {
+							#if HSCRIPT_ALLOWED
+							if (Assets.exists(Paths.hx('data/stage data/${stageData.scriptName}'))) {
+								stageScript = new HScript(Paths.hx('data/stage data/${stage}'), STAGE);
+								for (object in stageObjects) {
+									stageScript.set(object[0], object[1]);
 								}
-							} else
-								add(sprite);
-						}
-					}
-					if (stageData.scriptName == null) {
-						stageData.scriptName = stage;
-					}
-					if (FlxG.state is PlayState) {
-						#if HSCRIPT_ALLOWED
-						if (Assets.exists(Paths.hx('data/stage data/${stageData.scriptName}'))) {
-							stageScript = new HScript(Paths.hx('data/stage data/${stage}'), STAGE);
-							for (object in stageObjects) {
-								stageScript.set(object[0], object[1]);
 							}
+							#end
+							#if LUA_ALLOWED
+							if (Assets.exists(Paths.lua("stage data/" + stageData.scriptName))) {
+								stageScript = new LuaScript(#if MODDING_ALLOWED PolymodAssets #else Assets #end.getPath(Paths.lua("stage data/"
+									+ stageData.scriptName)));
+								stageScript.executeOn = STAGE;
+							}
+							#end
 						}
-						#end
-						#if LUA_ALLOWED
-						if (Assets.exists(Paths.lua("stage data/" + stageData.scriptName))) {
-							stageScript = new LuaScript(#if MODDING_ALLOWED PolymodAssets #else Assets #end.getPath(Paths.lua("stage data/"
-								+ stageData.scriptName)));
-							stageScript.executeOn = STAGE;
-						}
-						#end
 					}
-				}
+			}
 		}
 	}
 
@@ -279,6 +281,11 @@ class StageGroup extends FlxGroup {
 		super.destroy();
 		FlxDestroyUtil.destroy(infrontOfGFSprites);
 		FlxDestroyUtil.destroy(foregroundSprites);
+		p1_Cam_Offset = FlxDestroyUtil.put(p1_Cam_Offset);
+		p2_Cam_Offset = FlxDestroyUtil.put(p2_Cam_Offset);
+		player_1_Point = FlxDestroyUtil.put(player_1_Point);
+		player_2_Point = FlxDestroyUtil.put(player_2_Point);
+		gf_Point = FlxDestroyUtil.put(gf_Point);
 	}
 
 	public function beatHit() {

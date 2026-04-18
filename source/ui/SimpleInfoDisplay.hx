@@ -39,6 +39,7 @@ class SimpleInfoDisplay extends TextField {
 		this.x = x;
 		this.y = y;
 		selectable = false;
+		mouseEnabled = false;
 		defaultTextFormat = new TextFormat(font ?? Assets.getFont(Paths.font("vcr.ttf")).fontName, (font == "_sans" ? 12 : 14), color);
 
 		width = FlxG.width;

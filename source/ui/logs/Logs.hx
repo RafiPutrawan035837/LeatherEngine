@@ -1,7 +1,6 @@
 package ui.logs;
 
 import flixel.system.debug.log.LogStyle;
-import openfl.text.TextField;
 import lime.app.Application;
 import openfl.events.Event;
 import flixel.util.FlxColor;
@@ -30,6 +29,8 @@ class Logs extends Sprite {
 		super();
 
 		instance = this;
+
+		mouseEnabled = false;
 
 		bg = new Bitmap(new BitmapData(FlxG.width, FlxG.height, true, FlxColor.BLACK));
 		bg.alpha = 0.5;
@@ -79,7 +80,7 @@ class Logs extends Sprite {
 	public static inline function error(message:Dynamic) {
 		if (Logs.instance != null)
 			Logs.instance.addLog(message, PrintType.ERROR);
-		errors ++;
+		errors++;
 		if (LogStyle.ERROR.throwException) {
 			throw message;
 		}

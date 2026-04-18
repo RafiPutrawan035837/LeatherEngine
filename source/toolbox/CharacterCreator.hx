@@ -379,7 +379,7 @@ class CharacterCreator extends MusicBeatState {
 				add(stage.infrontOfGFSprites);
 				add(stage.foregroundSprites);
 
-				//reloadStage();
+				// reloadStage();
 				daAnim = curCharList[0];
 
 				var position = stage.getCharacterPos(char.isPlayer ? 0 : 1, char);
@@ -818,6 +818,13 @@ class CharacterCreator extends MusicBeatState {
 			if (animationInputName.text != "" && animationInputAnimationName.text != "") {
 				char.animation.addByPrefix(animationInputName.text, animationInputAnimationName.text, animationFramerateStepper.value,
 					animationLoopedCheckbox.checked);
+				for (anim in char.config.animations) {
+					try {
+						if (anim.name == animationInputName.text) {
+							char.config.animations.remove(anim);
+						}
+					} catch (e) {}
+				}
 				char.config.animations.push({
 					name: animationInputName.text,
 					animation_name: animationInputAnimationName.text,
@@ -840,8 +847,8 @@ class CharacterCreator extends MusicBeatState {
 			if (animationInputName.text != "") {
 				char.animation.remove(animationInputName.text);
 
-				for(animation in char.config.animations){
-					if(animation.name == animationInputName.text){
+				for (animation in char.config.animations) {
+					if (animation.name == animationInputName.text) {
 						char.config.animations.remove(animation);
 						break;
 					}
