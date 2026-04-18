@@ -21,6 +21,12 @@ This is the repository for Leather Engine, an engine created for making and play
 
 - [Some Mod Ports](https://github.com/Leather128/LeathersFNFModPorts)
 
+## For macOS users
+If the game doesn't launch, try running
+```sh
+sudo xattr -d com.apple.quarantine LeatherEngine.app
+```
+
 ## Build Instructions
 
 ### IMPORTANT
