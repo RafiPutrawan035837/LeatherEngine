@@ -199,6 +199,8 @@ class HScript extends Script {
 				otherScripts.remove(otherScripts[script_index]);
 		});
 
+		set("get", interp.variables.get);
+
 		set("otherScripts", otherScripts);
 
 		// playstate local shit

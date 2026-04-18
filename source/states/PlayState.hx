@@ -2459,7 +2459,10 @@ class PlayState extends MusicBeatState {
 			char?.playAnim(singAnim, force);
 		else {
 			var chars:Array<Int> = note?.characters ?? [];
-			var charID:Int = note?.character ?? char.mainCharacterID;
+			var charID:Int = note?.character ?? char?.mainCharacterID;
+			if(charID == 0 && char?.mainCharacterID != null){
+				charID = char.mainCharacterID;
+			}
 			if (chars.length <= 1)
 				char.otherCharacters[charID]?.playAnim(singAnim, force);
 			else {

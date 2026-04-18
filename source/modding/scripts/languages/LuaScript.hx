@@ -3395,18 +3395,6 @@ class LuaScript extends Script {
 			return FlxMath.equal(aValueA, aValueB, aDiff);
 		});
 
-		setFunction("fastCos", function(n:Float) {
-			return FlxMath.fastCos(n);
-		});
-
-		setFunction("fastSin", function(n:Float) {
-			return FlxMath.fastSin(n);
-		});
-
-		setFunction("fastTan", function(n:Float) {
-			return FlxMath.fastSin(n) / FlxMath.fastCos(n);
-		});
-
 		setFunction("fceil", function(n:Float) {
 			return Math.fceil(n);
 		});

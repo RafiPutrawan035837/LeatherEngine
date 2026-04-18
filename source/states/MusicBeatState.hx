@@ -77,7 +77,7 @@ class MusicBeatState extends #if MODCHARTING_TOOLS modcharting.ModchartMusicBeat
 	}
 
 	public function updateBeat():Void {
-		curDecBeat = curStep / Conductor.timeScale[1];
+		curDecBeat = curDecStep / Conductor.timeScale[1];
 		curBeat = Math.floor(curDecBeat);
 	}
 
