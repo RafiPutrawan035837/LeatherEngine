@@ -14,7 +14,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   buildLinux:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -48,6 +48,7 @@ jobs:
           cd $(haxelib libpath hxcpp)/tools/hxcpp
           haxe compile.hxml
           cd -
+          haxelib --always run lime rebuild cpp
           haxelib --always run lime setup
           haxelib --always run lime build Project.xml linux --app-version="4.0.0-${{ github.run_id}}"
       - name: Publish Linux Artifact
