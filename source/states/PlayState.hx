@@ -1638,8 +1638,10 @@ class PlayState extends MusicBeatState {
 
 			if (isPlayer)
 				playerStrums.add(babyArrow);
-			else
+			else {
 				enemyStrums.add(babyArrow);
+				babyArrow.animation.onFinish.add((animName:String) -> babyArrow.playAnim("static"));
+			}
 
 			babyArrow.x += 100 - ((usedKeyCount - 4) * 16) + (usedKeyCount >= 10 ? 30 : 0);
 			babyArrow.x += ((FlxG.width / 2) * pos);
@@ -2134,8 +2136,6 @@ class PlayState extends MusicBeatState {
 									}
 									splash_group.add(splash);
 								}
-
-								spr.animation.onFinish.add((animName:String) -> spr.playAnim("static"));
 							}
 						});
 					}
@@ -2460,7 +2460,7 @@ class PlayState extends MusicBeatState {
 		else {
 			var chars:Array<Int> = note?.characters ?? [];
 			var charID:Int = note?.character ?? char?.mainCharacterID;
-			if(charID == 0 && char?.mainCharacterID != null){
+			if (charID == 0 && char?.mainCharacterID != null) {
 				charID = char.mainCharacterID;
 			}
 			if (chars.length <= 1)
