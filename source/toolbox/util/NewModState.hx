@@ -254,7 +254,7 @@ class NewModState extends MusicBeatState {
 	override function update(elapsed:Float) {
 		super.update(elapsed);
 		if (FlxG.keys.anyJustPressed([ESCAPE])) {
-			FlxG.switchState(() -> new ToolboxState());
+			FlxG.switchState(() -> new ToolboxState("Categories", 0xFF00FF6A));
 		}
 	}
 
