@@ -42,10 +42,16 @@ class HScript extends Script {
 
 		setup();
 
-		interp.printCallStack = true;
-		interp.execute(program);
-		if (this.executeOn != STAGE)
-			call("create", [path]);
+		try{
+
+			interp.printCallStack = true;
+			interp.execute(program);
+			if (this.executeOn != STAGE)
+				call("create", [path]);
+		}
+		catch(e){
+			trace(e.details(), ERROR);
+		}
 	}
 
 	public inline function update(elapsed:Float)
@@ -84,8 +90,6 @@ class HScript extends Script {
 
 	override public function setup() {
 		// global class shit
-		// setDefaults();
-
 		// haxeflixel classes
 		set("FlxG", flixel.FlxG);
 		set("FlxSprite", flixel.FlxSprite);

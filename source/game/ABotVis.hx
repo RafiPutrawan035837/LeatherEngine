@@ -10,8 +10,6 @@ import flixel.graphics.frames.FlxAtlasFrames;
 import funkin.vis.dsp.SpectralAnalyzer;
 #end
 
-using Lambda;
-
 class ABotVis extends FlxSpriteGroup {
 	#if desktop
 	var analyzer:SpectralAnalyzer;
@@ -47,12 +45,6 @@ class ABotVis extends FlxSpriteGroup {
 			viz.animation.play('VIZ', false, false, 6);
 		}
 
-		#if desktop
-		@:privateAccess
-		analyzer = new SpectralAnalyzer(FlxG.sound.music._channel.__audioSource, 7, 0.1, 40);
-		#end
-		analyzer.fftN = 256;
-
 		// analyzer.maxDb = -35;
 	}
 
@@ -60,10 +52,21 @@ class ABotVis extends FlxSpriteGroup {
 		return x > y ? y : x;
 	}
 
+	private var ticks:Float = 0;
+
 	override function update(elapsed:Float) {
+		super.update(elapsed);
+
+		ticks += elapsed;
 		#if desktop
-		if (FlxG.sound.music != null) {
-			var levels = analyzer.getLevels();
+		@:privateAccess {
+			if (analyzer == null && (FlxG?.sound?.music?._channel?.__audioSource != null)) {
+				analyzer = new SpectralAnalyzer(FlxG?.sound?.music?._channel?.__audioSource, 7, 0.1, 40);
+				analyzer.fftN = 256;
+			}
+		}
+		if (FlxG.sound.music != null && analyzer != null) {
+			var levels = analyzer?.getLevels();
 
 			for (i in 0...min(group.members.length, levels.length)) {
 				var animFrame:Int = Math.round(levels[i].value * 5);
@@ -81,8 +84,11 @@ class ABotVis extends FlxSpriteGroup {
 
 				group.members[i].animation.curAnim.curFrame = animFrame;
 			}
+		} else {
+			for (i in 0...group.members.length) {
+				group.members[i].animation.curAnim.curFrame = Math.round(Math.sin(-ticks*5 + i) * 2.5 + 2.5);
+			}
 		}
 		#end
-		super.update(elapsed);
 	}
 }

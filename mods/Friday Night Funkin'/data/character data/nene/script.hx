@@ -33,16 +33,11 @@ function createPost() {
 	abot.scrollFactor.set(0.95, 0.95);
 	objects.push(abot);
 
-	FlxG.sound.music = new FlxSound().loadEmbedded(Paths.inst(PlayState.SONG.song,
-		(PlayState.SONG.specialAudioName == null ? PlayState.instance.storyDifficultyStr.toLowerCase() : PlayState.SONG.specialAudioName), PlayState.instance.boyfriend.curCharacter));
-	FlxG.sound.music.play();
-	FlxG.sound.music.volume = 0;
 	abotViz = new ABotVis();
 	abotViz.x = character.x + 105;
 	abotViz.y = character.y + 400;
 	abotViz.scrollFactor.set(0.95, 0.95);
 	objects.push(abotViz);
-	FlxG.sound.music.pause();
 
 	abot.x = character.x - 100;
 	abot.y = character.y + 316; // 764 - 740
@@ -75,8 +70,6 @@ function dance() {
 }
 
 function startSong() {
-	FlxG.sound.music.play();
-	FlxG.sound.music.volume = 1;
 	movePupilsLeft();
 }
 
