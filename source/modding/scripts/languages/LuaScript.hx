@@ -91,10 +91,24 @@ class LuaScript extends Script {
 		else if (lua_Tweens.exists(id))
 			return lua_Tweens.get(id);
 
+		var splitID = id.split(".");
+
 		if (Reflect.getProperty(PlayState.instance, id) != null)
 			return Reflect.getProperty(PlayState.instance, id);
 		else if (Reflect.getProperty(PlayState, id) != null)
 			return Reflect.getProperty(PlayState, id);
+		else if (splitID.length > 1) {
+			var lastFound = getActorByName(splitID[0]);
+			if (lastFound != null) {
+				for (i in 1...splitID.length) {
+					var newFound = Reflect.getProperty(lastFound, splitID[i]);
+					if (newFound != null) {
+						lastFound = newFound;
+					}
+				}
+			}
+			return lastFound;
+		}
 
 		if (PlayState.strumLineNotes.length - 1 >= Std.parseInt(id))
 			return PlayState.strumLineNotes.members[Std.parseInt(id)];
@@ -115,6 +129,8 @@ class LuaScript extends Script {
 			return lua_Cameras.get(id);
 
 		switch (id.toLowerCase().trim()) {
+			case 'camgame' | 'game':
+				return lua_Cameras.get("game");
 			case 'camhud' | 'hud':
 				return lua_Cameras.get("hud");
 			case 'camother' | 'other':
@@ -201,7 +217,7 @@ class LuaScript extends Script {
 
 		var result:Int = LuaL.dofile(lua, path); // execute le file
 
-		if (result != 0) {
+		if (result != Lua.LUA_OK) {
 			CoolUtil.coolError("Lua ERROR:\n" + Lua.tostring(lua, result), "Leather Engine Modcharts");
 			// return;
 			// FlxG.switchState(new MainMenuState());
@@ -695,6 +711,21 @@ class LuaScript extends Script {
 		setFunction("setActorAlignment", function(id:String, align:String) {
 			if (getActorByName(id) != null)
 				Reflect.setProperty(getActorByName(id), "alignment", align);
+		});
+
+		setFunction("setTextBorderStyle", function(id:String, text:String) {
+			if (getActorByName(id) != null) {
+				cast(getActorByName(id), FlxText).borderStyle = switch (text.toLowerCase()) {
+					case "shadow":
+						FlxTextBorderStyle.SHADOW;
+					case "outline":
+						Options.getData("lowQuality") ? FlxTextBorderStyle.OUTLINE_FAST : FlxTextBorderStyle.OUTLINE;
+					case "outline_fast":
+						FlxTextBorderStyle.OUTLINE_FAST;
+					default:
+						FlxTextBorderStyle.NONE;
+				}
+			}
 		});
 
 		setFunction("makeText", function(id:String, text:String, x:Float, y:Float, size:Int = 32, font:String = "vcr.ttf", fieldWidth:Float = 0) {
@@ -3306,6 +3337,8 @@ class LuaScript extends Script {
 		setFunction("getOption", function(saveStr:String, saveKey:String = "main") {
 			return Options.getData(saveStr, saveKey);
 		});
+
+		setFunction("setOption", Options.setData);
 
 		setFunction("getCurrentMod", function(saveStr:String) {
 			return Options.getData("curMod");

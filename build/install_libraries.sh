@@ -6,7 +6,7 @@ haxelib --global update haxelib
 haxelib git hxcpp https://github.com/FunkinCrew/hxcpp
 haxelib install format
 haxelib install hxp
-haxelib --skip-dependencies git lime https://github.com/swordcubes-grave-of-shite/lime
+haxelib --skip-dependencies git lime https://github.com/swordcubes-grave-of-shite/lime-fc-old d33313e85b1655fa48c3b4ee107173b673683eaf
 haxelib --skip-dependencies git openfl https://github.com/swordcubes-grave-of-shite/openfl ce9641599a5343dff7e04f942a0f6b12fa98cb3d
 haxelib --skip-dependencies git flixel https://github.com/swordcubes-grave-of-shite/flixel be195af29beb962ed1018c0e8977133fb08184d8 
 haxelib --skip-dependencies git flixel-addons https://github.com/swordcubes-grave-of-shite/flixel-addons 43ec587fcc004d20a6219cf22d83c8644379a2f2

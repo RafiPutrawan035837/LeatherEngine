@@ -338,6 +338,11 @@ class PlayState extends MusicBeatState {
 	var iconP2:HealthIcon;
 
 	/**
+	 * Should icon hitboxes be updated automatically?
+	 */
+	var autoUpdateIconHitboxes:Bool = true;
+
+	/**
 	 * `FlxCamera` for misc elements.
 	 * Drawn over hud.
 	 */
@@ -1879,8 +1884,10 @@ class PlayState extends MusicBeatState {
 		iconP2.scale.set(Math.min(iconP2.scale.x, iconP2.startSize + 0.2 * iconP2.startSize),
 			Math.min(iconP2.scale.y, iconP2.startSize + 0.2 * iconP2.startSize));
 
-		iconP1.updateHitbox();
-		iconP2.updateHitbox();
+		if(autoUpdateIconHitboxes){
+			iconP1.updateHitbox();
+			iconP2.updateHitbox();
+		}
 
 		var iconOffset:Float = 26.0;
 
@@ -3447,7 +3454,7 @@ class PlayState extends MusicBeatState {
 		openSubState(res);
 	}
 
-	function getRatingText():String {
+	dynamic function getRatingText():String {
 		var ratingArray:Array<Int> = [
 			ratings.get("marvelous"),
 			ratings.get("sick"),
