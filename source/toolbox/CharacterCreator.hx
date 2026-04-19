@@ -542,6 +542,7 @@ class CharacterCreator extends MusicBeatState {
 			ghost.animation.destroyAnimations();
 			ghost.loadCharacterConfiguration(char.config);
 			ghost.flipX = char.flipX;
+			ghost.scale.set(char.scale.x, char.scale.y);
 			for (anim => offsets in char.animOffsets) {
 				ghostAnimList.push(anim);
 			}

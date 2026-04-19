@@ -145,4 +145,8 @@ class MathUtil {
 		// Convert logarithmic scale to linear
 		return 1 - (Math.log(x) / Math.log(minValue));
 	}
+
+	public static function distance(x1:Float, y1:Float, x2:Float, y2:Float):Float {
+		return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+	}
 }

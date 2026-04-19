@@ -1,5 +1,7 @@
 package toolbox;
 
+import flixel.util.FlxSpriteUtil;
+import flixel.addons.ui.U;
 import ui.Popup;
 import flixel.text.FlxInputText;
 import flixel.addons.ui.FlxUINumericStepper;
@@ -32,7 +34,7 @@ class StageMakingState extends MusicBeatState {
 	/* STAGE STUFF */
 	var stages:Array<String>;
 
-	var stage_Name:String = 'stage';
+	var stageName:String = 'stage';
 
 	var stage:StageGroup;
 
@@ -48,9 +50,9 @@ class StageMakingState extends MusicBeatState {
 	var gf:Character;
 	var dad:Character;
 
-	var bf_Pos:FlxSprite;
-	var gf_Pos:FlxSprite;
-	var dad_Pos:FlxSprite;
+	var bfPos:FlxSprite;
+	var gfPos:FlxSprite;
+	var dadPos:FlxSprite;
 
 	var selectedThing:Bool = false;
 	var selected:Dynamic;
@@ -59,33 +61,35 @@ class StageMakingState extends MusicBeatState {
 	var selectedObject:Int = 0;
 
 	/* UI */
-	var json_Button:FlxButton;
-	var stage_Dropdown:FlxScrollableDropDownMenu;
-	var object_Dropdown:FlxScrollableDropDownMenu;
-	var cam_Zoom:FlxText;
+	var jsonButton:FlxButton;
+	var stageDropdown:FlxScrollableDropDownMenu;
+	var objectDropdown:FlxScrollableDropDownMenu;
+	var stageZoom:FlxUINumericStepper;
+	var zoomLabel:FlxText;
+	var camZoom:FlxText;
 
-	var stage_Label:FlxText;
-	var sprite_Label:FlxText;
+	var stageLabel:FlxText;
+	var spriteLabel:FlxText;
 
 	var xStepper:FlxUINumericStepper;
-	var x_Label:FlxText;
+	var xLabel:FlxText;
 
 	var yStepper:FlxUINumericStepper;
-	var y_Label:FlxText;
+	var yLabel:FlxText;
 
 	var charDropDown:FlxScrollableDropDownMenu;
 
 	var scaleStepper:FlxUINumericStepper;
-	var scale_Label:FlxText;
+	var scaleLabel:FlxText;
 
 	var alphaStepper:FlxUINumericStepper;
-	var alpha_Label:FlxText;
+	var alphaLabel:FlxText;
 
 	var fileInput:FlxInputText;
-	var file_Label:FlxText;
+	var fileLabel:FlxText;
 
 	var scrollStepper:FlxUINumericStepper;
-	var scroll_Label:FlxText;
+	var scrollLabel:FlxText;
 
 	var UI_box:FlxUITabMenu;
 
@@ -98,13 +102,17 @@ class StageMakingState extends MusicBeatState {
 
 	var camFollow:FlxObject;
 
+	var canPopup:Bool = true;
+
+	var cameraPreview:FlxSprite;
+
 	function new(selectedStage:String) {
 		super();
 
 		stages = CoolUtil.coolTextFile(Paths.txt('stageList'));
 
 		if (selectedStage != null)
-			stage_Name = selectedStage;
+			stageName = selectedStage;
 	}
 
 	override function create() {
@@ -138,93 +146,104 @@ class StageMakingState extends MusicBeatState {
 		UI_box.scrollFactor.set();
 		UI_box.cameras = [camHUD];
 
-		stage_Label = new FlxText(20, startY + 10, 0, "Stage Settings", 12);
-		stage_Label.scrollFactor.set();
-		stage_Label.cameras = [camHUD];
-
-		stage_Dropdown = new FlxScrollableDropDownMenu(20, stage_Label.y + stage_Label.height + 4, FlxUIDropDownMenu.makeStrIdLabelArray(stages, true),
+		stageLabel = new FlxText(20, startY + 10, 0, "Stage Settings", 12);
+		stageLabel.scrollFactor.set();
+		stageLabel.cameras = [camHUD];
+		stageDropdown = new FlxScrollableDropDownMenu(20, stageLabel.y + stageLabel.height + 4, FlxUIDropDownMenu.makeStrIdLabelArray(stages, true),
 			function(stageName:String) {
-				var popup:Popup = null;
-				popup = new Popup(BOOL, [
-					() -> {
-						stage_Name = stages[Std.parseInt(stageName)];
-						reloadStage();
-						remove(popup);
-					},
-					() -> {
-						remove(popup);
-					}
-				], "This will clear all progress. Continue?");
-				popup.cameras = [camHUD];
-				add(popup);
+				if (canPopup) {
+					var popup:Popup = null;
+					popup = new Popup(BOOL, [
+						() -> {
+							stageName = stages[Std.parseInt(stageName)];
+							reloadStage();
+							remove(popup);
+							canPopup = true;
+						},
+						() -> {
+							remove(popup);
+							canPopup = true;
+						}
+					], "This will clear all progress. Continue?");
+					popup.cameras = [camHUD];
+					add(popup);
+					canPopup = false;
+				}
 			});
 
-		stage_Dropdown.selectedLabel = stage_Name;
-		stage_Dropdown.scrollFactor.set();
-		stage_Dropdown.cameras = [camHUD];
+		stageDropdown.selectedLabel = stageName;
+		stageDropdown.scrollFactor.set();
+		stageDropdown.cameras = [camHUD];
 
-		cam_Zoom = new FlxText(10, 0, 0, "Camera Zoom: " + stageCam.zoom, 24);
-		cam_Zoom.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE_FAST, FlxColor.BLACK);
-		cam_Zoom.scrollFactor.set();
-		cam_Zoom.cameras = [camHUD];
+		camZoom = new FlxText(10, 0, 0, "Camera Zoom: " + stageCam.zoom, 24);
+		camZoom.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE_FAST, FlxColor.BLACK);
+		camZoom.scrollFactor.set();
+		camZoom.cameras = [camHUD];
 
-		json_Button = new FlxButton(stage_Dropdown.x + stage_Dropdown.width + 4, stage_Dropdown.y, "Save JSON", function() {
-			saveLevel();
-		});
-		json_Button.scrollFactor.set();
-		json_Button.cameras = [camHUD];
+		jsonButton = new FlxButton(stageDropdown.x + stageDropdown.width + 4, stageDropdown.y, "Save JSON", saveLevel);
+		jsonButton.scrollFactor.set();
+		jsonButton.cameras = [camHUD];
 
-		sprite_Label = new FlxText(20, json_Button.y + json_Button.height + 4, 0, "sprite Settings", 12);
-		sprite_Label.scrollFactor.set();
-		sprite_Label.cameras = [camHUD];
+		stageZoom = new FlxUINumericStepper(jsonButton.x + jsonButton.width + 4, jsonButton.y + 4, 0.05, stageData?.camera_Zoom ?? 1, 0.1, 10, 2);
+		stageZoom.scrollFactor.set();
+		stageZoom.cameras = [camHUD];
+		stageZoom.name = "stage_zoom";
 
-		xStepper = new FlxUINumericStepper(20, sprite_Label.y + sprite_Label.height + 4, 1, 0, -100000, 100000, 1);
+		zoomLabel = new FlxText(stageZoom.x, stageZoom.y - stageZoom.height - 2, 0, "Stage Zoom", 10);
+		zoomLabel.scrollFactor.set();
+		zoomLabel.cameras = [camHUD];
+
+		spriteLabel = new FlxText(20, jsonButton.y + jsonButton.height + 4, 0, "Sprite Settings", 12);
+		spriteLabel.scrollFactor.set();
+		spriteLabel.cameras = [camHUD];
+
+		xStepper = new FlxUINumericStepper(20, spriteLabel.y + spriteLabel.height + 4, 1, 0, -100000, 100000, 1);
 		xStepper.value = 0;
 		xStepper.name = "x_stepper";
 		xStepper.scrollFactor.set();
 		xStepper.cameras = [camHUD];
 
-		x_Label = new FlxText(xStepper.x + xStepper.width + 2, xStepper.y - 2, 0, "X", 10);
-		x_Label.scrollFactor.set();
-		x_Label.cameras = [camHUD];
+		xLabel = new FlxText(xStepper.x + xStepper.width + 2, xStepper.y - 2, 0, "X", 10);
+		xLabel.scrollFactor.set();
+		xLabel.cameras = [camHUD];
 
-		yStepper = new FlxUINumericStepper(x_Label.x + x_Label.width + 2, xStepper.y, 1, 0, -100000, 100000, 1);
+		yStepper = new FlxUINumericStepper(xLabel.x + xLabel.width + 2, xStepper.y, 1, 0, -100000, 100000, 1);
 		yStepper.value = 0;
 		yStepper.name = "y_stepper";
 		yStepper.scrollFactor.set();
 		yStepper.cameras = [camHUD];
 
-		y_Label = new FlxText(yStepper.x + yStepper.width + 2, yStepper.y - 2, 0, "Y", 10);
-		y_Label.scrollFactor.set();
-		y_Label.cameras = [camHUD];
+		yLabel = new FlxText(yStepper.x + yStepper.width + 2, yStepper.y - 2, 0, "Y", 10);
+		yLabel.scrollFactor.set();
+		yLabel.cameras = [camHUD];
 
-		scaleStepper = new FlxUINumericStepper(20, y_Label.y + y_Label.height + 4, 0.05, 0, 0.1, 999, 2);
+		scaleStepper = new FlxUINumericStepper(20, yLabel.y + yLabel.height + 4, 0.05, 0, 0.1, 999, 2);
 		scaleStepper.value = 0;
 		scaleStepper.name = "scale_stepper";
 		scaleStepper.scrollFactor.set();
 		scaleStepper.cameras = [camHUD];
 
-		scale_Label = new FlxText(scaleStepper.x + scaleStepper.width + 2, scaleStepper.y - 2, 0, "Scale", 10);
-		scale_Label.scrollFactor.set();
-		scale_Label.cameras = [camHUD];
+		scaleLabel = new FlxText(scaleStepper.x + scaleStepper.width + 2, scaleStepper.y - 2, 0, "Scale", 10);
+		scaleLabel.scrollFactor.set();
+		scaleLabel.cameras = [camHUD];
 
-		alphaStepper = new FlxUINumericStepper(scale_Label.x + scale_Label.width + 2, scaleStepper.y, 0.05, 0, 0, 1, 2);
+		alphaStepper = new FlxUINumericStepper(scaleLabel.x + scaleLabel.width + 2, scaleStepper.y, 0.05, 0, 0, 1, 2);
 		alphaStepper.value = 0;
 		alphaStepper.name = "alpha_stepper";
 		alphaStepper.scrollFactor.set();
 		alphaStepper.cameras = [camHUD];
 
-		alpha_Label = new FlxText(alphaStepper.x + alphaStepper.width + 2, alphaStepper.y - 2, 0, "Alpha", 10);
-		alpha_Label.scrollFactor.set();
-		alpha_Label.cameras = [camHUD];
+		alphaLabel = new FlxText(alphaStepper.x + alphaStepper.width + 2, alphaStepper.y - 2, 0, "Alpha", 10);
+		alphaLabel.scrollFactor.set();
+		alphaLabel.cameras = [camHUD];
 
 		fileInput = new FlxInputText(20, scaleStepper.y + scaleStepper.height + 2, 70, "", 8);
 		fileInput.scrollFactor.set();
 		fileInput.cameras = [camHUD];
 
-		file_Label = new FlxText(fileInput.x + fileInput.width + 2, fileInput.y - 2, 0, "File Name", 10);
-		file_Label.scrollFactor.set();
-		file_Label.cameras = [camHUD];
+		fileLabel = new FlxText(fileInput.x + fileInput.width + 2, fileInput.y - 2, 0, "File Name", 10);
+		fileLabel.scrollFactor.set();
+		fileLabel.cameras = [camHUD];
 
 		scrollStepper = new FlxUINumericStepper(fileInput.x, fileInput.y + fileInput.height + 2, 0.05, 0, 0, 10, 2);
 		scrollStepper.value = 0;
@@ -232,9 +251,9 @@ class StageMakingState extends MusicBeatState {
 		scrollStepper.scrollFactor.set();
 		scrollStepper.cameras = [camHUD];
 
-		scroll_Label = new FlxText(scrollStepper.x + scrollStepper.width + 2, scrollStepper.y - 2, 0, "Scroll Factor", 10);
-		scroll_Label.scrollFactor.set();
-		scroll_Label.cameras = [camHUD];
+		scrollLabel = new FlxText(scrollStepper.x + scrollStepper.width + 2, scrollStepper.y - 2, 0, "Scroll Factor", 10);
+		scrollLabel.scrollFactor.set();
+		scrollLabel.cameras = [camHUD];
 
 		var characterData:Array<String> = CoolUtil.coolTextFile(Paths.txt('characterList'));
 
@@ -246,11 +265,11 @@ class StageMakingState extends MusicBeatState {
 			chars.push(charName);
 		}
 
-		charDropDown = new FlxScrollableDropDownMenu(y_Label.x + y_Label.width + 2, yStepper.y - 2, FlxUIDropDownMenu.makeStrIdLabelArray(chars, true),
+		charDropDown = new FlxScrollableDropDownMenu(yLabel.x + yLabel.width + 2, yStepper.y - 2, FlxUIDropDownMenu.makeStrIdLabelArray(chars, true),
 			function(character:String) {
 				var daChar = chars[Std.parseInt(character)];
 
-				if (selected == bf_Pos) {
+				if (selected == bfPos) {
 					remove(bf);
 					bf.kill();
 					bf.destroy();
@@ -272,7 +291,7 @@ class StageMakingState extends MusicBeatState {
 					}
 
 					stage.setCharOffsets(bf, gf, dad);
-				} else if (selected == gf_Pos) {
+				} else if (selected == gfPos) {
 					remove(gf);
 					gf.kill();
 					gf.destroy();
@@ -294,7 +313,7 @@ class StageMakingState extends MusicBeatState {
 					}
 
 					stage.setCharOffsets(bf, gf, dad);
-				} else if (selected == dad_Pos) {
+				} else if (selected == dadPos) {
 					remove(dad);
 					dad.kill();
 					dad.destroy();
@@ -329,21 +348,21 @@ class StageMakingState extends MusicBeatState {
 
 		reloadStage();
 
-		bf_Pos = new FlxSprite(stage.player_1_Point.x, stage.player_1_Point.y);
-		bf_Pos.makeGraphic(32, 32, FlxColor.RED);
-		bf_Pos.updateHitbox();
+		bfPos = new FlxSprite(stage.player_1_Point.x, stage.player_1_Point.y);
+		bfPos.makeGraphic(32, 32, FlxColor.RED);
+		bfPos.updateHitbox();
 
-		gf_Pos = new FlxSprite(stage.gf_Point.x, stage.gf_Point.y);
-		gf_Pos.makeGraphic(32, 32, FlxColor.RED);
-		gf_Pos.updateHitbox();
+		gfPos = new FlxSprite(stage.gf_Point.x, stage.gf_Point.y);
+		gfPos.makeGraphic(32, 32, FlxColor.RED);
+		gfPos.updateHitbox();
 
-		dad_Pos = new FlxSprite(stage.player_2_Point.x, stage.player_2_Point.y);
-		dad_Pos.makeGraphic(32, 32, FlxColor.RED);
-		dad_Pos.updateHitbox();
+		dadPos = new FlxSprite(stage.player_2_Point.x, stage.player_2_Point.y);
+		dadPos.makeGraphic(32, 32, FlxColor.RED);
+		dadPos.updateHitbox();
 
-		add(bf_Pos);
-		add(gf_Pos);
-		add(dad_Pos);
+		add(bfPos);
+		add(gfPos);
+		add(dadPos);
 	}
 
 	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>) {
@@ -352,12 +371,14 @@ class StageMakingState extends MusicBeatState {
 			var wname = nums.name;
 
 			switch (wname) {
+				case 'stage_zoom':
+					stageData.camera_Zoom = nums.value;
 				case 'x_stepper':
-					if (selectedObject != 0 || selected == bf_Pos || selected == dad_Pos || selected == gf_Pos) {
+					if (selectedObject != 0 || selected == bfPos || selected == dadPos || selected == gfPos) {
 						selected.x = nums.value;
 
-						if (selected == bf_Pos || selected == dad_Pos || selected == gf_Pos) {
-							if (selected == bf_Pos) {
+						if (selected == bfPos || selected == dadPos || selected == gfPos) {
+							if (selected == bfPos) {
 								stage.player_1_Point.x = selected.x;
 								stage.player_1_Point.y = selected.y;
 
@@ -365,7 +386,7 @@ class StageMakingState extends MusicBeatState {
 									stageData.character_Positions[0] = [stage.player_1_Point.x, stage.player_1_Point.y];
 
 								stage.setCharOffsets(bf, gf, dad);
-							} else if (selected == gf_Pos) {
+							} else if (selected == gfPos) {
 								stage.gf_Point.x = selected.x;
 								stage.gf_Point.y = selected.y;
 
@@ -373,7 +394,7 @@ class StageMakingState extends MusicBeatState {
 									stageData.character_Positions[2] = [stage.gf_Point.x, stage.gf_Point.y];
 
 								stage.setCharOffsets(bf, gf, dad);
-							} else if (selected == dad_Pos) {
+							} else if (selected == dadPos) {
 								stage.player_2_Point.x = selected.x;
 								stage.player_2_Point.y = selected.y;
 
@@ -388,11 +409,11 @@ class StageMakingState extends MusicBeatState {
 						}
 					}
 				case 'y_stepper':
-					if (selectedObject != 0 || selected == bf_Pos || selected == dad_Pos || selected == gf_Pos) {
+					if (selectedObject != 0 || selected == bfPos || selected == dadPos || selected == gfPos) {
 						selected.y = nums.value;
 
-						if (selected == bf_Pos || selected == dad_Pos || selected == gf_Pos) {
-							if (selected == bf_Pos) {
+						if (selected == bfPos || selected == dadPos || selected == gfPos) {
+							if (selected == bfPos) {
 								stage.player_1_Point.x = selected.x;
 								stage.player_1_Point.y = selected.y;
 
@@ -400,7 +421,7 @@ class StageMakingState extends MusicBeatState {
 									stageData.character_Positions[0] = [stage.player_1_Point.x, stage.player_1_Point.y];
 
 								stage.setCharOffsets(bf, gf, dad);
-							} else if (selected == gf_Pos) {
+							} else if (selected == gfPos) {
 								stage.gf_Point.x = selected.x;
 								stage.gf_Point.y = selected.y;
 
@@ -408,7 +429,7 @@ class StageMakingState extends MusicBeatState {
 									stageData.character_Positions[2] = [stage.gf_Point.x, stage.gf_Point.y];
 
 								stage.setCharOffsets(bf, gf, dad);
-							} else if (selected == dad_Pos) {
+							} else if (selected == dadPos) {
 								stage.player_2_Point.x = selected.x;
 								stage.player_2_Point.y = selected.y;
 
@@ -423,7 +444,7 @@ class StageMakingState extends MusicBeatState {
 						}
 					}
 				case 'scale_stepper':
-					if (selectedObject != 0 && !(selected == bf_Pos || selected == dad_Pos || selected == gf_Pos)) {
+					if (selectedObject != 0 && !(selected == bfPos || selected == dadPos || selected == gfPos)) {
 						var object = stageData.objects[selectedObject - 1];
 						var sprite:Dynamic = objects[selectedObject - 1][1];
 
@@ -436,45 +457,45 @@ class StageMakingState extends MusicBeatState {
 						stageData.objects[selectedObject - 1].scale = stageData.objects[selectedObject - 1].scaleY = nums.value;
 					}
 				case 'alpha_stepper':
-					if (selectedObject != 0 || selected == bf_Pos || selected == dad_Pos || selected == gf_Pos) {
-						if (!(selected == bf_Pos || selected == dad_Pos || selected == gf_Pos))
+					if (selectedObject != 0 || selected == bfPos || selected == dadPos || selected == gfPos) {
+						if (!(selected == bfPos || selected == dadPos || selected == gfPos))
 							Reflect.setProperty(stage.stageObjects[selectedObject - 1][1], "alpha", nums.value);
 						else {
-							if (selected == bf_Pos)
+							if (selected == bfPos)
 								bf.alpha = nums.value;
-							else if (selected == gf_Pos)
+							else if (selected == gfPos)
 								gf.alpha = nums.value;
-							else if (selected == dad_Pos)
+							else if (selected == dadPos)
 								dad.alpha = nums.value;
 						}
 
-						if (!(selected == bf_Pos || selected == dad_Pos || selected == gf_Pos))
+						if (!(selected == bfPos || selected == dadPos || selected == gfPos))
 							stageData.objects[selectedObject - 1].alpha = nums.value;
 					}
 				case 'scroll_stepper':
-					if (selectedObject != 0 && !(selected == bf_Pos || selected == dad_Pos || selected == gf_Pos)) {
+					if (selectedObject != 0 && !(selected == bfPos || selected == dadPos || selected == gfPos)) {
 						var cool:Dynamic = stage.stageObjects[selectedObject - 1][1];
 
 						cool.scrollFactor.set(nums.value, nums.value);
 
 						stageData.objects[selectedObject - 1].scroll_Factor = [nums.value, nums.value];
-					} else if ((selected == bf_Pos || selected == dad_Pos || selected == gf_Pos)) {
+					} else if ((selected == bfPos || selected == dadPos || selected == gfPos)) {
 						if (stageData.character_Scrolls == null)
 							stageData.character_Scrolls = [1, 1, 0.95];
 
-						if (selected == bf_Pos) {
+						if (selected == bfPos) {
 							stageData.character_Scrolls[0] = nums.value;
 							stage.p1_Scroll = nums.value;
 							bf.scrollFactor.set(nums.value, nums.value);
 						}
 
-						if (selected == dad_Pos) {
+						if (selected == dadPos) {
 							stageData.character_Scrolls[1] = nums.value;
 							stage.p2_Scroll = nums.value;
 							dad.scrollFactor.set(nums.value, nums.value);
 						}
 
-						if (selected == gf_Pos) {
+						if (selected == gfPos) {
 							stageData.character_Scrolls[2] = nums.value;
 							stage.gf_Scroll = nums.value;
 							gf.scrollFactor.set(nums.value, nums.value);
@@ -493,7 +514,7 @@ class StageMakingState extends MusicBeatState {
 			if (prevFileName != fileInput.text) {
 				stageData.objects[selectedObject - 1].file_Name = fileInput.text;
 
-				if (selectedObject != 0 && !(selected == bf_Pos || selected == dad_Pos || selected == gf_Pos)) {
+				if (selectedObject != 0 && !(selected == bfPos || selected == dadPos || selected == gfPos)) {
 					var object:StageObject = stageData.objects[selectedObject - 1];
 					var sprite:Dynamic = objects[selectedObject - 1][1];
 
@@ -503,7 +524,7 @@ class StageMakingState extends MusicBeatState {
 						sprite.updateHitbox();
 
 					if (object.is_Animated) {
-						sprite.frames = Paths.getSparrowAtlas(stage_Name + "/" + fileInput.text, "stages");
+						sprite.frames = Paths.getSparrowAtlas(stageName + "/" + fileInput.text, "stages");
 
 						for (Animation in object.animations) {
 							var Anim_Name = Animation.name;
@@ -517,7 +538,7 @@ class StageMakingState extends MusicBeatState {
 						if (object.start_Animation != "" && object.start_Animation != null && object.start_Animation != "null")
 							sprite.animation.play(object.start_Animation);
 					} else
-						sprite.loadGraphic(Paths.gpuBitmap(stage_Name + "/" + fileInput.text, "stages"));
+						sprite.loadGraphic(Paths.gpuBitmap(stageName + "/" + fileInput.text, "stages"));
 
 					if (object.updateHitbox || object.updateHitbox == null)
 						sprite.updateHitbox();
@@ -532,9 +553,9 @@ class StageMakingState extends MusicBeatState {
 
 		prevFileName = fileInput.text;
 
-		if (FlxG.mouse.overlaps(bf_Pos) && FlxG.mouse.pressed && !selectedThing) {
+		if (FlxG.mouse.overlaps(bfPos) && FlxG.mouse.pressed && !selectedThing) {
 			selectedThing = true;
-			selected = bf_Pos;
+			selected = bfPos;
 
 			xStepper.value = selected.x;
 			yStepper.value = selected.y;
@@ -542,9 +563,9 @@ class StageMakingState extends MusicBeatState {
 			scrollStepper.value = bf.scrollFactor.x;
 
 			selectedObject = 0;
-		} else if (FlxG.mouse.overlaps(gf_Pos) && FlxG.mouse.pressed && !selectedThing) {
+		} else if (FlxG.mouse.overlaps(gfPos) && FlxG.mouse.pressed && !selectedThing) {
 			selectedThing = true;
-			selected = gf_Pos;
+			selected = gfPos;
 
 			xStepper.value = selected.x;
 			yStepper.value = selected.y;
@@ -552,9 +573,9 @@ class StageMakingState extends MusicBeatState {
 			scrollStepper.value = gf.scrollFactor.x;
 
 			selectedObject = 0;
-		} else if (FlxG.mouse.overlaps(dad_Pos) && FlxG.mouse.pressed && !selectedThing) {
+		} else if (FlxG.mouse.overlaps(dadPos) && FlxG.mouse.pressed && !selectedThing) {
 			selectedThing = true;
-			selected = dad_Pos;
+			selected = dadPos;
 
 			xStepper.value = selected.x;
 			yStepper.value = selected.y;
@@ -594,7 +615,7 @@ class StageMakingState extends MusicBeatState {
 			alphaStepper.value = selected.alpha;
 			scrollStepper.value = selected.scrollFactor.x;
 
-			if (selected == bf_Pos) {
+			if (selected == bfPos) {
 				stage.player_1_Point.x = selected.x;
 				stage.player_1_Point.y = selected.y;
 
@@ -602,7 +623,7 @@ class StageMakingState extends MusicBeatState {
 					stageData.character_Positions[0] = [stage.player_1_Point.x, stage.player_1_Point.y];
 
 				stage.setCharOffsets(bf, gf, dad);
-			} else if (selected == gf_Pos) {
+			} else if (selected == gfPos) {
 				stage.gf_Point.x = selected.x;
 				stage.gf_Point.y = selected.y;
 
@@ -610,7 +631,7 @@ class StageMakingState extends MusicBeatState {
 					stageData.character_Positions[2] = [stage.gf_Point.x, stage.gf_Point.y];
 
 				stage.setCharOffsets(bf, gf, dad);
-			} else if (selected == dad_Pos) {
+			} else if (selected == dadPos) {
 				stage.player_2_Point.x = selected.x;
 				stage.player_2_Point.y = selected.y;
 
@@ -644,18 +665,18 @@ class StageMakingState extends MusicBeatState {
 				sprite.scrollFactor.set(stageData.objects[spriteIndex].scroll_Factor[0], stageData.objects[spriteIndex].scroll_Factor[1]);
 		}
 
-		bf_Pos.setPosition(stage.player_1_Point.x, stage.player_1_Point.y);
-		gf_Pos.setPosition(stage.gf_Point.x, stage.gf_Point.y);
-		dad_Pos.setPosition(stage.player_2_Point.x, stage.player_2_Point.y);
+		bfPos.setPosition(stage.player_1_Point.x, stage.player_1_Point.y);
+		gfPos.setPosition(stage.gf_Point.x, stage.gf_Point.y);
+		dadPos.setPosition(stage.player_2_Point.x, stage.player_2_Point.y);
 
 		if (bf != null)
-			bf_Pos.scrollFactor.set(bf.scrollFactor.x, bf.scrollFactor.y);
+			bfPos.scrollFactor.set(bf.scrollFactor.x, bf.scrollFactor.y);
 
 		if (gf != null)
-			gf_Pos.scrollFactor.set(gf.scrollFactor.x, gf.scrollFactor.y);
+			gfPos.scrollFactor.set(gf.scrollFactor.x, gf.scrollFactor.y);
 
 		if (dad != null)
-			dad_Pos.scrollFactor.set(dad.scrollFactor.x, dad.scrollFactor.y);
+			dadPos.scrollFactor.set(dad.scrollFactor.x, dad.scrollFactor.y);
 
 		var shiftThing:Int = FlxG.keys.pressed.SHIFT ? 5 : 1;
 
@@ -684,11 +705,17 @@ class StageMakingState extends MusicBeatState {
 
 		// camera movement zoom
 		if (!fileInput.hasFocus) {
-			if (FlxG.keys.justPressed.E)
-				stageCam.zoom += 0.1;
+			if (FlxG.keys.pressed.E && stageCam.zoom < 2)
+				stageCam.zoom += elapsed * stageCam.zoom * (FlxG.keys.pressed.SHIFT ? 1 : 0.1);
+			if (FlxG.keys.pressed.Q && stageCam.zoom >= 0.1)
+				stageCam.zoom -= elapsed * stageCam.zoom * (FlxG.keys.pressed.SHIFT ? 1 : 0.1);
+			if (FlxG.mouse.wheel != 0 && stageCam.zoom >= 0.1 && stageCam.zoom <= 2)
+				stageCam.zoom += FlxG.keys.pressed.SHIFT ? FlxG.mouse.wheel / 100.0 : FlxG.mouse.wheel / 10.0;
 
-			if (FlxG.keys.justPressed.Q)
-				stageCam.zoom -= 0.1;
+			if (stageCam.zoom > 2)
+				stageCam.zoom = 2;
+			if (stageCam.zoom < 0.1)
+				stageCam.zoom = 0.1;
 
 			if (FlxG.keys.justPressed.ESCAPE)
 				FlxG.switchState(() -> new ToolboxState("Categories", 0xFF00FF6A));
@@ -699,10 +726,12 @@ class StageMakingState extends MusicBeatState {
 			stageCam.zoom = 0.1;
 
 		// da math
-		zoom = FlxMath.roundDecimal(stageCam.zoom, 1);
+		zoom = FlxMath.roundDecimal(stageCam.zoom, 2);
 
-		cam_Zoom.text = 'Camera Zoom: $zoom\nIJKL to move camera\nE and Q to zoom\nSHIFT for faster camera\n';
-		cam_Zoom.x = FlxG.width - cam_Zoom.width - 2;
+		camZoom.text = 'Camera Zoom: $zoom\nIJKL to move camera\nE and Q to zoom\nSHIFT for faster camera\n';
+		camZoom.x = FlxG.width - camZoom.width - 2;
+		cameraPreview.scale.x = cameraPreview.scale.y = 1 /stageData.camera_Zoom;
+        cameraPreview.x = (FlxG.width / 2) + stageCam.x - (cameraPreview.width / 2);
 	}
 
 	function removeCharacter(char:Character) {
@@ -730,8 +759,11 @@ class StageMakingState extends MusicBeatState {
 	}
 
 	function reloadStage(changing:Bool = true) {
-		objects = [];
-		stageObjectPos = [];
+		for (pos in stageObjectPos) {
+			remove(pos);
+		}
+		U.clearArray(objects);
+		U.clearArray(stageObjectPos);
 		selectedObject = 0;
 
 		if (stage != null) {
@@ -744,10 +776,12 @@ class StageMakingState extends MusicBeatState {
 		}
 		add(camFollow);
 
-		stage = new StageGroup(stage_Name);
+		stage = new StageGroup(stageName);
 		add(stage);
 
 		stageData = stage.stageData;
+
+		stageZoom.value = stageData.camera_Zoom;
 
 		stage.setCharOffsets(bf, gf, dad);
 
@@ -760,9 +794,18 @@ class StageMakingState extends MusicBeatState {
 
 		add(stage.foregroundSprites);
 
-		add(bf_Pos);
-		add(gf_Pos);
-		add(dad_Pos);
+		remove(cameraPreview);
+		cameraPreview = new FlxSprite(0, 0);
+		cameraPreview.loadGraphic(Paths.gpuBitmap("cam outline"));
+		cameraPreview.antialiasing = false;
+		cameraPreview.scrollFactor.set();
+		cameraPreview.x = ((FlxG.width - 300) / 2) - (cameraPreview.width / 2);
+		cameraPreview.alpha = 0.5;
+		add(cameraPreview);
+
+		add(bfPos);
+		add(gfPos);
+		add(dadPos);
 
 		for (objectArray in stage.stageObjects) {
 			objects.push([objectArray[0], objectArray[1]]);
@@ -778,33 +821,34 @@ class StageMakingState extends MusicBeatState {
 
 		add(UI_box);
 
-		add(stage_Label);
+		add(stageLabel);
 
-		add(cam_Zoom);
-		add(json_Button);
-
-		add(sprite_Label);
+		add(camZoom);
+		add(jsonButton);
+		add(stageZoom);
+		add(zoomLabel);
+		add(spriteLabel);
 
 		add(xStepper);
-		add(x_Label);
+		add(xLabel);
 
 		add(yStepper);
-		add(y_Label);
+		add(yLabel);
 
 		add(scaleStepper);
-		add(scale_Label);
+		add(scaleLabel);
 
 		add(alphaStepper);
-		add(alpha_Label);
+		add(alphaLabel);
 
 		add(fileInput);
-		add(file_Label);
+		add(fileLabel);
 
 		add(scrollStepper);
-		add(scroll_Label);
+		add(scrollLabel);
 
 		add(charDropDown);
-		add(stage_Dropdown);
+		add(stageDropdown);
 	}
 
 	override function beatHit() {
@@ -815,7 +859,6 @@ class StageMakingState extends MusicBeatState {
 		danceCharacter(bf);
 		danceCharacter(dad);
 		danceCharacter(gf);
-
 	}
 
 	function saveLevel() {
@@ -827,7 +870,7 @@ class StageMakingState extends MusicBeatState {
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 
-			_file.save(data.trim(), stage_Name + ".json");
+			_file.save(data.trim(), stageName + ".json");
 		}
 	}
 

@@ -188,6 +188,9 @@
 	<!-- Target-Specific Defines. -->
 	<define name="NO_PRECOMPILED_HEADERS" if="linux" />
 
+	
 	<!-- Window Icon Path -->
 	<icon path="art/icon.png" />
+	
+	<setenv name="HAXEPATH" value="./" />
 </project>
