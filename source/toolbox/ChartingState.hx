@@ -1421,6 +1421,7 @@ class ChartingState extends MusicBeatState {
 
 					FlxG.sound.music.time -= (FlxG.mouse.wheel * Conductor.stepCrochet * 0.4);
 					vocals.time = FlxG.sound.music.time;
+					Conductor.songPosition = FlxG.sound.music.time;
 				}
 			}
 
@@ -1445,6 +1446,9 @@ class ChartingState extends MusicBeatState {
 				if (FlxG.sound.music.time > FlxG.sound.music.length) {
 					changeSection(0);
 				}
+
+									Conductor.songPosition = FlxG.sound.music.time;
+
 			}
 
 			var shiftThing:Int = 1;
@@ -1572,7 +1576,8 @@ class ChartingState extends MusicBeatState {
 			FlxG.sound.music.time = 0;
 			curSection = 0;
 		}
-		Conductor.songPosition = vocals.time = FlxG.sound.music.time;
+		vocals.time = FlxG.sound.music.time;
+		Conductor.songPosition = vocals.time;
 		updateCurStep();
 
 		updateGrid();

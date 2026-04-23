@@ -18,8 +18,8 @@ class ToolboxState extends OptionsMenu {
 			],
 			"Tools" => [
 				new PageOption("Back", "Categories", "Go back to the main menu."),
-				new GameStateOption("Charter", ChartingState, "Open the chart editor."),
-				new CharacterCreatorOption("Character Creator", () -> new CharacterCreator("dad", "stage"), "Open the character creator."),
+				new GameStateOption("Chart Editor", ChartingState, "Open the chart editor."),
+				new CharacterCreatorOption("Character Editor", () -> new CharacterCreator("dad", "stage"), "Open the character editor."),
 				new GameStateOption("Stage Editor", () -> new StageMakingState("stage"), "Open the stage editor."),
 				#if MODCHARTING_TOOLS
 				new GameStateOption("Modchart Editor", modcharting.ModchartEditorState, "Open the modchart editor.")

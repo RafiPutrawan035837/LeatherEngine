@@ -1,6 +1,6 @@
 package toolbox;
 
-import flixel.util.FlxSpriteUtil;
+import openfl.display.BlendMode;
 import flixel.addons.ui.U;
 import ui.Popup;
 import flixel.text.FlxInputText;
@@ -68,6 +68,9 @@ class StageMakingState extends MusicBeatState {
 	var zoomLabel:FlxText;
 	var camZoom:FlxText;
 
+	var blendDropDown:FlxScrollableDropDownMenu;
+	var blendLabel:FlxText;
+
 	var stageLabel:FlxText;
 	var spriteLabel:FlxText;
 
@@ -106,6 +109,8 @@ class StageMakingState extends MusicBeatState {
 
 	var cameraPreview:FlxSprite;
 
+	var blendModes:Array<String> = ["normal", "add", "darken", "lighten", "multiply", "screen", "subtract"];
+
 	function new(selectedStage:String) {
 		super();
 
@@ -129,6 +134,8 @@ class StageMakingState extends MusicBeatState {
 
 		FlxG.camera = stageCam;
 
+		stage = new StageGroup(stageName);
+
 		bf = new Character(0, 0, bfChar, true);
 
 		gf = new Character(0, 0, gfChar);
@@ -150,12 +157,12 @@ class StageMakingState extends MusicBeatState {
 		stageLabel.scrollFactor.set();
 		stageLabel.cameras = [camHUD];
 		stageDropdown = new FlxScrollableDropDownMenu(20, stageLabel.y + stageLabel.height + 4, FlxUIDropDownMenu.makeStrIdLabelArray(stages, true),
-			function(stageName:String) {
+			function(stageID:String) {
 				if (canPopup) {
 					var popup:Popup = null;
 					popup = new Popup(BOOL, [
 						() -> {
-							stageName = stages[Std.parseInt(stageName)];
+							stageName = stages[Std.parseInt(stageID)];
 							reloadStage();
 							remove(popup);
 							canPopup = true;
@@ -255,6 +262,27 @@ class StageMakingState extends MusicBeatState {
 		scrollLabel.scrollFactor.set();
 		scrollLabel.cameras = [camHUD];
 
+		blendDropDown = new FlxScrollableDropDownMenu(scrollStepper.x, scrollStepper.y + scrollStepper.height + 2,
+			FlxUIDropDownMenu.makeStrIdLabelArray(blendModes, true), function(blend:String) {
+				try {
+					@:privateAccess
+					var blendMode = BlendMode.fromString(blendModes[Std.parseInt(blend)]);
+					var sprite:Dynamic = objects[selectedObject - 1][1];
+					if (!(sprite is Character)) {
+						sprite.blend = blendMode;
+						stageData.objects[selectedObject - 1].blend = blendMode;
+					}
+				} catch (e) {}
+		});
+
+		blendDropDown.selectedLabel = stageName;
+		blendDropDown.scrollFactor.set();
+		blendDropDown.cameras = [camHUD];
+
+		blendLabel = new FlxText(blendDropDown.x + blendDropDown.width + 2, blendDropDown.y, 0, "Blend Mode", 10);
+		blendLabel.scrollFactor.set();
+		blendLabel.cameras = [camHUD];
+
 		var characterData:Array<String> = CoolUtil.coolTextFile(Paths.txt('characterList'));
 
 		var chars:Array<String> = ["bf", "gf", ""];
@@ -346,8 +374,6 @@ class StageMakingState extends MusicBeatState {
 
 		FlxG.camera.follow(camFollow);
 
-		reloadStage();
-
 		bfPos = new FlxSprite(stage.player_1_Point.x, stage.player_1_Point.y);
 		bfPos.makeGraphic(32, 32, FlxColor.RED);
 		bfPos.updateHitbox();
@@ -360,9 +386,7 @@ class StageMakingState extends MusicBeatState {
 		dadPos.makeGraphic(32, 32, FlxColor.RED);
 		dadPos.updateHitbox();
 
-		add(bfPos);
-		add(gfPos);
-		add(dadPos);
+		reloadStage();
 	}
 
 	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>) {
@@ -537,8 +561,9 @@ class StageMakingState extends MusicBeatState {
 
 						if (object.start_Animation != "" && object.start_Animation != null && object.start_Animation != "null")
 							sprite.animation.play(object.start_Animation);
-					} else
+					} else {
 						sprite.loadGraphic(Paths.gpuBitmap(stageName + "/" + fileInput.text, "stages"));
+					}
 
 					if (object.updateHitbox || object.updateHitbox == null)
 						sprite.updateHitbox();
@@ -561,7 +586,6 @@ class StageMakingState extends MusicBeatState {
 			yStepper.value = selected.y;
 			alphaStepper.value = bf.alpha;
 			scrollStepper.value = bf.scrollFactor.x;
-
 			selectedObject = 0;
 		} else if (FlxG.mouse.overlaps(gfPos) && FlxG.mouse.pressed && !selectedThing) {
 			selectedThing = true;
@@ -588,18 +612,24 @@ class StageMakingState extends MusicBeatState {
 				var sprite = stageObjectPos[spriteIndex];
 
 				if (FlxG.mouse.overlaps(sprite) && FlxG.mouse.pressed && !selectedThing) {
-					selectedObject = spriteIndex + 1;
+					try {
+						selectedObject = spriteIndex + 1;
 
-					selectedThing = true;
-					selected = sprite;
+						selectedThing = true;
+						selected = sprite;
 
-					xStepper.value = selected.x;
-					yStepper.value = selected.y;
+						xStepper.value = selected.x;
+						yStepper.value = selected.y;
 
-					var cool:Dynamic = objects[spriteIndex][1];
+						var cool:FlxSprite = objects[spriteIndex][1];
 
-					alphaStepper.value = cool.alpha;
-					scrollStepper.value = cool.scrollFactor.x;
+						alphaStepper.value = cool.alpha;
+						scrollStepper.value = cool.scrollFactor.x;
+
+						blendDropDown.selectedLabel = Std.string(cool.blend) == "null" ? "normal" : Std.string(cool.blend);
+					} catch (e) {
+						trace(e.details(), ERROR);
+					}
 				}
 			}
 		} else if (!FlxG.mouse.pressed)
@@ -730,8 +760,8 @@ class StageMakingState extends MusicBeatState {
 
 		camZoom.text = 'Camera Zoom: $zoom\nIJKL to move camera\nE and Q to zoom\nSHIFT for faster camera\n';
 		camZoom.x = FlxG.width - camZoom.width - 2;
-		cameraPreview.scale.x = cameraPreview.scale.y = 1 /stageData.camera_Zoom;
-        cameraPreview.x = (FlxG.width / 2) + stageCam.x - (cameraPreview.width / 2);
+		cameraPreview.scale.x = cameraPreview.scale.y = 1 / stageData.camera_Zoom;
+		cameraPreview.x = (FlxG.width / 2) + stageCam.x - (cameraPreview.width / 2);
 	}
 
 	function removeCharacter(char:Character) {
@@ -758,7 +788,7 @@ class StageMakingState extends MusicBeatState {
 		}
 	}
 
-	function reloadStage(changing:Bool = true) {
+	function reloadStage() {
 		for (pos in stageObjectPos) {
 			remove(pos);
 		}
@@ -766,14 +796,12 @@ class StageMakingState extends MusicBeatState {
 		U.clearArray(stageObjectPos);
 		selectedObject = 0;
 
-		if (stage != null) {
-			stage.clear();
-			remove(stage);
-			stage.infrontOfGFSprites.clear();
-			remove(stage.infrontOfGFSprites);
-			stage.foregroundSprites.clear();
-			remove(stage.foregroundSprites);
-		}
+		stage.clear();
+		remove(stage);
+		stage.infrontOfGFSprites.clear();
+		remove(stage.infrontOfGFSprites);
+		stage.foregroundSprites.clear();
+		remove(stage.foregroundSprites);
 		add(camFollow);
 
 		stage = new StageGroup(stageName);
@@ -827,6 +855,7 @@ class StageMakingState extends MusicBeatState {
 		add(jsonButton);
 		add(stageZoom);
 		add(zoomLabel);
+
 		add(spriteLabel);
 
 		add(xStepper);
@@ -846,6 +875,10 @@ class StageMakingState extends MusicBeatState {
 
 		add(scrollStepper);
 		add(scrollLabel);
+
+		add(blendDropDown);
+		add(blendLabel);
+		blendDropDown.selectedLabel = blendModes[0];
 
 		add(charDropDown);
 		add(stageDropdown);
